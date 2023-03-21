@@ -77,7 +77,7 @@ function buildAccount(){
 
         fs.writeFileSync(
             `accounts/${accountName}.json`,
-            "{'balance:0'}",
+            "{'balance':0}",
             function (err){
                 console.error(err)
             }
