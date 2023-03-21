@@ -27,6 +27,7 @@ function operation(){
 
         if (action === 'Criar conta') {
             console.log('Criando sua conta...')
+            createAccount()
         }
         else if (action === 'Consultar saldo') {
             console.log('Consultando saldo...')
@@ -43,6 +44,47 @@ function operation(){
                 process.exit()
             }, 1500);
         }
+    })
+}
+//#endregion
+
+//#region Criação de Contas
+function createAccount(){
+    console.log(chalk.bgGreen.black("Obrigado por escolher o Banco ETEC."))
+    console.log(chalk.green("Defina as opções de conta:"))
+
+    buildAccount()
+}
+
+function buildAccount(){
+    inquirer.prompt([
+        {
+            name: "accountName",
+            message: "Digite um nome para a sua conta: "
+        }
+    ]).then((answer) => {
+        console.info(answer["accountName"])
+        const accountName = answer["accountName"]
+
+        if (!fs.existsSync("accounts")) {
+            fs.mkdirSync("accounts")
+        }
+
+        if (fs.existsSync(`accounts/${accountName}.json`)) {
+            console.log(chalk.bgRed.black("Esta conta já existe, escolha outro nome!"))
+            buildAccount(accountName)
+        }
+
+        fs.writeFileSync(
+            `accounts/${accountName}.json`,
+            "{'balance:0'}",
+            function (err){
+                console.error(err)
+            }
+        )
+
+        console.info(chalk.green("Parabéns, sua conta foi criada com sucesso!"))
+        operation()
     })
 }
 //#endregion
