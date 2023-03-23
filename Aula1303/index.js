@@ -73,11 +73,12 @@ function buildAccount(){
         if (fs.existsSync(`accounts/${accountName}.json`)) {
             console.log(chalk.bgRed.black("Esta conta já existe, escolha outro nome!"))
             buildAccount(accountName)
+            return
         }
 
         fs.writeFileSync(
             `accounts/${accountName}.json`,
-            "{'balance':0}",
+            '{"balance":0}',
             function (err){
                 console.error(err)
             }
@@ -86,6 +87,45 @@ function buildAccount(){
         console.info(chalk.green("Parabéns, sua conta foi criada com sucesso!"))
         operation()
     })
+}
+//#endregion
+
+//#region Depósito na conta
+function deposit(){
+    inquirer.prompt([
+        {
+            name: "accountName",
+            message: "Qual conta deseja depositar?"
+        }
+    ]).then((answer) => {
+        const accountName = answer["accountName"]
+
+        if (!checkAccount(accountName)) {
+            return deposit()
+        }
+        
+        inquirer;prompt([
+            {
+                name: "amount",
+                message: "Quanto deseja depositar?"
+            }
+        ]).then((answer) => {
+            const amount = answer["amount"]
+
+            addAmount(accountName, amount)
+
+            setTimeout(() => {
+                operation()
+            }, 1000)
+        })
+    })
+}
+
+function checkAccount(accountName){
+    if (!fs.existsSync(`accounts/${accountName}.json`)) {
+        return false
+    }
+    return true
 }
 //#endregion
 
