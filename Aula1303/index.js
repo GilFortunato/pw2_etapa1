@@ -34,6 +34,7 @@ function operation(){
         }
         else if (action === 'Depositar') {
             console.log('Depositando...')
+            deposit()
         }
         else if (action === 'Sacar') {
             console.log('Sacando...')
@@ -72,8 +73,7 @@ function buildAccount(){
 
         if (fs.existsSync(`accounts/${accountName}.json`)) {
             console.log(chalk.bgRed.black("Esta conta já existe, escolha outro nome!"))
-            buildAccount(accountName)
-            return
+            return buildAccount(accountName)
         }
 
         fs.writeFileSync(
@@ -104,15 +104,16 @@ function deposit(){
             return deposit()
         }
         
-        inquirer;prompt([
+        inquirer.prompt([
             {
                 name: "amount",
                 message: "Quanto deseja depositar?"
             }
         ]).then((answer) => {
             const amount = answer["amount"]
-
             addAmount(accountName, amount)
+            
+            console.log(chalk.bgYellow.green("Sucesso! Seu montate foi depositado."))
 
             setTimeout(() => {
                 operation()
@@ -126,6 +127,31 @@ function checkAccount(accountName){
         return false
     }
     return true
+}
+
+function getAccount(accountName){
+    const accountJSON = fs.readFileSync(`accounts/${accountName}.json`,
+    {
+        encoding: "utf8",
+        flag: "r"
+    })
+
+    return JSON.parse(accountJSON)
+}
+
+function addAmount(accountName, amount){
+    const accountData = getAccount(accountName)
+
+    if (!amount) {
+        console.log(chalk.bgRed.black("Erro de montante!"))
+        return deposit()
+    }
+
+    accountData.balance = parseFloat(amount) + parseFloat(accountData.balance)
+    fs.writeFileSync(`accounts/${accountName}.json`, JSON.stringify(accountData), function (err){
+        console.log(err)
+    })
+    console.log(chalk.bgGreen.white("Seu valor foi depositado!"))
 }
 //#endregion
 
